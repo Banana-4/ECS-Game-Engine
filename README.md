@@ -7,7 +7,7 @@ This project explores the use of design patterns as tools for reasoning about st
 
 ## ECS
 
-Entity-Component-System is a design aproach that breaks a complex data set managing system into its essential parts: identity, data and behaviour.
+Entity-Component-System is a design aproach that breaks a complex data sets managing system into its essential parts: identity, data and behaviour.
 
  - Entity is a unique identifier that represents a group of components that form a single data set. It has no behaviour or data other then the one used for identifcation.
 
@@ -27,31 +27,47 @@ The separation that it provides allows working independetly on:
 ECS reduces coupling, improves clarity, allows reusing of concepts and makes large systems easier to reason about and extend.
 
 ### ECS design pattern in use as a tool to reason about a game:
-A game in the simplest form is made from a set of game objects.
+A game in the simplest form is made from a set of game objects and rules that govern how the objects interact.
 Game object is the basic data unit of a game. A collection of states and operations.
 The states are the data properties that define a object.
-The operations represent a set of behaviours that the game objects are capable of. Each operation manipulates a set of states, alone or by calling other operations.
+The rules of interaction represent systems that use the data of a game objects to the state of the game or of a game object.
 
-#### Loking at a game through the ECS pattern:
+#### Why a ECS design pattern is a good fit for a game:
 
 1. Game object - represents a identifier for a set of states and behaviours. It is a Entity.
-2. State - data that defines a single property of the object, a component.
-3. Operation - systems that operate on sets of data.
+2. Game data - components from which a game object is built. 
+3. Game rules - systems that operate on game data, manipulating its value or checking if a condition is meet.
 
-The ECS cleanly and precisly saparates the game object into Entity, Components and Systems.
-The consequance of this saperation is that operations are not any longer tied to a game object.
-States are now just parts that can be exchanged and viewed in isolation from logic that should operate on them.
-The game object is a identifiable set of data, database entry. It has no behaviour of its own, it is just a collection of editable data.
+A game object can be decomposed cleanly and precise into a Entity (identifier), individual components (single properties), systems(game rules, game object behaviours).
 
-In a ECS pattern the whole game is just a state machine where each execution is a transition defined by the decisons what systems to call and when.
+This makes the properties definitions reusable by distinct game objects. The systems are no longer tied to one object and can be applied to all game objects that have the required properties. 
+
+Within a ECS pattern, game objects are no longer a encapsulated structure with complex inheritence. They are now composed groups of data on which systems operate.
+
+A game can be modeled like a database for the purpose of reasoning and design.
+The database system processes data in real time to create a game.
+
+A game object is a data record, like a account in a banking system that is a collection of informations:
+1. Name
+2. Balance
+3. type
+Those individual informations are the components.
+The systems are precise rules that define what can be done with a data entry examples deposit, withdraw.
+
+This all turns a complicated game into a well know CS concept database management.
+
 
 ## Moduls:
 
 ### ECS:
-The core of the game responsiable for tiening toghter all the subsystems into a game loop.
+
 
 ### Memory:
-The memory subsystem is responsable for storing components and entities in memory and for providing efficent accses for systems to data.
+
+The memory management subsystem is responsible for storing and managing all data used by the engine.
+It organizes memory into contiguous blocks, each dedicated to storing elements of a specific data type.
+Each block represents a dense, cache-friendly storage layout that allows fast access and iteration.
+The memory system is also responsible for providing a clear interface for storing and accessing data, while hiding the details of operation.
 
 ### Entity:
 Header defining the structure and the informations that are used to identifie and group components into a Entity.
