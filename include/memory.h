@@ -1,20 +1,23 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define POS_STRIDE 2
+#define MAX_ENTITIES 10000
 
-//stores data that contains two ints
 typedef struct {
-  int* data;
+  int* x;
+  int* y;
   int capacity;
   int size;
-} PackedArray;
+  
+  int* cmp_id;
+  int id_map[MAX_ENTITIES];
+} PackedPositions;
 
-bool pa_init(PackedArray* pa, int capacity);
-bool pa_push(PackedArray* pa, int x, int y);
-bool pa_remove(PackedArray* pa, int n);
-void pa_free(PackedArray* pa);
-void pa_print(PackedArray* pa, char* msg);
+bool pp_init(PackedPositions* pp, int capacity);
+bool pp_push(PackedPositions* pp, int id, int x, int y);
+bool pp_remove(PackedPositions* pp, int i);
+void pp_free(PackedPositions* pp);
+void pp_print(PackedPositions* pp);
 
 
 
