@@ -15,7 +15,7 @@ typedef struct {
 
 bool pp_init(PackedPositions* pp, int capacity);
 bool pp_push(PackedPositions* pp, int id, int x, int y);
-bool pp_remove(PackedPositions* pp, int i);
+bool pp_remove(PackedPositions* pp, int id);
 void pp_free(PackedPositions* pp);
 void pp_print(PackedPositions* pp);
 
