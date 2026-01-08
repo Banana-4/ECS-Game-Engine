@@ -30,11 +30,11 @@ bool pp_init(PackedPositions* pp, int capacity) {
 }
 
 bool pp_push(PackedPositions* pp, int id, int x, int y) {
-  if(!pp->data) {
+  if(!pp->x || !p->y) {
     return false;
   }
 
-  if(pp->size == pa->capacity) {
+  if(pp->size == pp->capacity) {
     return false;
   }
   
@@ -64,10 +64,11 @@ bool pp_remove(PackedPositions* pp, int i) {
   pp->y[i] = pp->y[pp->size];
   
   int id = pp->cmp_id[pp->size];
+  pp->cmp_id[pp->size] = -1;
+  pp->id_map[pp->cmp_id[i]] = -1;
   pp->id_map[id] = i;
   pp->cmp_id[i] = id;
 
-  pp->id_map[i] = -1;
 
   return true;
 }
