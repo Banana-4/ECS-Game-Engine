@@ -50,25 +50,22 @@ bool pp_push(PackedPositions* pp, int id, int x, int y) {
 
 }
 
-bool pp_remove(PackedPositions* pp, int i) {
+bool pp_remove(PackedPositions* pp, int id) {
   if(!pp || !pp->x || !pp->y) {
     return false;
   }
   
-  if (i >= pp->size || i < 0) {
+  if (id >= MAX_ENTITIES || id < 0 || pp->id_map[id] == -1) {
     return false;
   }
-  
+ 
   pp->size--;
-  pp->x[i] = pp->x[pp->size];
-  pp->y[i] = pp->y[pp->size];
+  pp->x[pp->id_map[id]] = pp->x[pp->size];
+  pp->y[pp->id_map[id]] = pp->y[pp->size];
   
-  int id = pp->cmp_id[pp->size];
-  pp->cmp_id[pp->size] = -1;
-  pp->id_map[pp->cmp_id[i]] = -1;
-  pp->id_map[id] = i;
-  pp->cmp_id[i] = id;
-
+  pp->id_map[pp->cmp_id[pp->size]] = pp->id_map[id];
+  pp->cmp_id[pp->id_map[id]] = pp->cmp_id[pp->size];
+  pp->id_map[id] = -1;
 
   return true;
 }
