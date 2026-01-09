@@ -103,7 +103,7 @@ bool ph_init(PackedHealths* ph, int capacity) {
   if(!ph || capacity <= 0) return false;
   ph->hp = (double*) malloc(sizeof(double)* capacity);
   if(!ph->hp) return false;
-  ph->cmp_id = (double*) malloc(sizeof(double)* capacity);
+  ph->cmp_id = (int*) malloc(sizeof(int)* capacity);
   if(!ph->cmp_id) {
     free(ph->hp);
     return false;
@@ -117,8 +117,8 @@ bool ph_init(PackedHealths* ph, int capacity) {
 }
 
 bool ph_push(PackedHealths* ph, int id, double hp) {
-  if(!ph || hp < 0) return false;
-
+  if(!ph || ph->capacity == ph->size) return false;
+  
   ph->hp[ph->size] = hp;
   ph->cmp_id[ph->size] = id;
   ph->id_map[id] = ph->size;
@@ -157,6 +157,6 @@ void ph_print(PackedHealths* ph) {
   }
 
   for (int i = 0; i < ph->size; ++i)
-    printf("Index: %d, ID: %d, HP: %d\n", i, ph->cmp_id[i], ph->hp[i]);
+    printf("Index: %d, ID: %d, HP: %f\n", i, ph->cmp_id[i], ph->hp[i]);
 }
 
