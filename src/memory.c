@@ -50,12 +50,18 @@ bool pp_push(PackedPositions* pp, int id, int x, int y) {
 
 }
 
+bool pp_has(PackedPositions* pp, int id) {
+  if(!pp) return false;
+  return (pp->id_map[id] != -1);
+}
+
+
 bool pp_remove(PackedPositions* pp, int id) {
   if(!pp || !pp->x || !pp->y) {
     return false;
   }
   
-  if (id >= MAX_ENTITIES || id < 0 || pp->id_map[id] == -1) {
+  if (pp->id_map[id] == -1) {
     return false;
   }
  
@@ -89,6 +95,68 @@ void pp_print(PackedPositions* pp) {
     return;
   }
   for(int i = 0; i < pa->size; i++) {
-    printf("Index: %d X: %d Y: %d\n", i, pp->x[i], pp->y[i]);
+    printf("Index: %d, ID: %d, X: %d, Y: %d\n", i,pp->cmp_id[i] , pp->x[i], pp->y[i]);
   }
 }
+
+bool ph_init(PackedHealths* ph, int capacity) {
+  if(!ph || capacity <= 0) return false;
+  ph->hp = (double*) malloc(sizeof(double)* capacity);
+  if(!ph->hp) return false;
+  ph->cmp_id = (double*) malloc(sizeof(double)* capacity);
+  if(!ph->cmp_id) {
+    free(ph->hp);
+    return false;
+  }
+  ph->capacity = capacity;
+  ph->size = 0;
+  for(int i = 0; i < MAX_ENTITIES; ++i) {
+    ph->id_map[i] = -1;
+  }
+  return true;
+}
+
+bool ph_push(PackedHealths* ph, int id, double hp) {
+  if(!ph || hp < 0) return false;
+
+  ph->hp[ph->size] = hp;
+  ph->cmp_id[ph->size] = id;
+  ph->id_map[id] = ph->size;
+  ++ph->size;
+  return true;
+}
+
+bool ph_has(PackedHealths* ph, int id) {
+  if(!ph) return false;
+  return (ph->id_map[id] != -1);
+}
+
+bool ph_remove(PackedHealths* ph, int id) {
+  if(!ph || ph->id_map[id] == -1) return false;
+  ph->hp[ph->id_map[id]] = ph->hp[--ph->size];
+  ph->cmp_id[ph->id_map[id]] = ph->cmp_id[ph->size];
+  ph->id_map[ph->cmp_id[ph->size]] = ph->id_map[id];
+  ph->id_map[id] = -1;
+  return true;
+}
+
+void ph_free(PackedHealths* ph) {
+  if(!ph) return;
+  free(ph->hp);
+  free(ph->cmp_id);
+  ph->cmp_id = NULL;
+  ph->hp = NULL;
+  ph->capacity = 0;
+  ph->size = 0;
+}
+
+void ph_print(PackedHealths* ph) {
+  if(!ph) {
+    printf("No health components");
+    return;
+  }
+
+  for (int i = 0; i < ph->size; ++i)
+    printf("Index: %d, ID: %d, HP: %d\n", i, ph->cmp_id[i], ph->hp[i]);
+}
+
