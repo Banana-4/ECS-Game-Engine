@@ -61,16 +61,19 @@ bool pp_remove(PackedPositions* pp, int id) {
     return false;
   }
   
-  if (pp->id_map[id] == -1) {
+  int idx = pp->id_map[id];
+  if (idx == -1) {
     return false;
   }
  
   pp->size--;
-  pp->x[pp->id_map[id]] = pp->x[pp->size];
-  pp->y[pp->id_map[id]] = pp->y[pp->size];
+  int lastId = pp->cmp_id[pp->size];
+
+  pp->x[idx] = pp->x[pp->size];
+  pp->y[idx] = pp->y[pp->size];
   
-  pp->id_map[pp->cmp_id[pp->size]] = pp->id_map[id];
-  pp->cmp_id[pp->id_map[id]] = pp->cmp_id[pp->size];
+  pp->id_map[lastId] = idx;
+  pp->cmp_id[idx] = lastId;
   pp->id_map[id] = -1;
 
   return true;
@@ -132,11 +135,19 @@ bool ph_has(PackedHealths* ph, int id) {
 }
 
 bool ph_remove(PackedHealths* ph, int id) {
-  if(!ph || ph->id_map[id] == -1) return false;
-  ph->hp[ph->id_map[id]] = ph->hp[--ph->size];
-  ph->cmp_id[ph->id_map[id]] = ph->cmp_id[ph->size];
-  ph->id_map[ph->cmp_id[ph->size]] = ph->id_map[id];
+  if(!ph) return false;
+  
+  int idx = ph->id_map[id];
+  if (idx == -1) return false;
+  ph->size--;
+  int lastId = ph->cmp_id[ph->size];
+
+  ph->hp[idx] = ph->hp[ph->size];
+  ph->cmp_id[idx] = lastId;
+
+  ph->id_map[lastId] = idx;
   ph->id_map[id] = -1;
+
   return true;
 }
 
