@@ -4,6 +4,21 @@
 #define MAX_ENTITIES 10000
 
 typedef struct {
+  int* id;
+  unsigned* cmp_mask;
+  int capacity;
+  int size;
+  
+  int id_map[MAX_ENTITIES];
+} PackedEntities;
+
+bool pe_init(PackedEntities* pe, int capacity);
+bool pe_push(PackedEntities* pe, int id, unsigned mask);
+bool pe_remove(PackedEntities* pe, int id);
+void pe_free(PackedEntities* pe);
+void pe_print(PackedEntities* pe);
+
+typedef struct {
   int* x;
   int* y;
   int capacity;
