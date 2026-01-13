@@ -65,7 +65,7 @@ The whole game can be viewed like a interactive database system that processes d
 ### Memory:
 
 This module is a subsystem that is responsible for allocating and freeing memory, organizing data into memory layout that is cache-friendly and provides fast access to data.
-It uses a Structs of Arrays as the primary data storing unit.
+It uses Structs of Arrays as the primary data storing unit.
 Each SoA is stores a single type of components with the ownership data.
 The component data is stored into packed arrays and the ownership data is stored into a sparse array, where each index position represents the ID and the value at each index is the index of the component that belongs to that ID.
 
@@ -78,7 +78,29 @@ The memory system has a clean and simple interface for each SoA:
 
 
 ### Entity:
-Header defining the structure and the informations that are used to identifie and group components into a Entity.
+
+Subsystem for creating IDs and associating them with components.
+The subsystems core responsibility is to ensure the creation of unique whole number IDs in inclusive range 0 to MAX_ENTITIES, while allowing reuse of decommissioned IDs.
+Reuse of decommissioned IDs is achieved through their storage into a module managed stack.
+The module is also responsible for providing access to the Entity store for iteration.
+
+Data owned:
+  1. The IDs.
+  2. The entities store.
+  3. Decommissioned  IDs stack.
+  4. stack size.
+
+#### Interface:
+
+  1. init_entities - Allocates the storage and sets the total number of entities. If the allocation fails the whole System is stopped.
+  2. create_entity - Assigns a ID and associates it with components using a unsigned mask. If all the IDs from the pool are taken the creation of the Entity is aborted and a false signal is returned.
+  3. remove_entity - Removes the given id and its mask from the store and pushes the decommissioned ID onto the stack. If the ID is not in the store, nothing is done and false is returned.
+  4. kill_entities - Shutdown the module, by freeing all the used memory.
+
+
+#### Module specific functions:
+
+  1. get_id - returns the next available ID, popping from the stack or returning the next integer in line. If the max number of IDs is already given it returns -1.
 
 ### Components:
 Header file where components are defined, it provides a template for instanciating diffrent component objects.
