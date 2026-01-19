@@ -100,9 +100,9 @@ typedef struct {
   int id_map[MAX_ENTITIES];
 } PackedAttacks;
 
-bool pa_init(PackedAttacks *ph, int capacity);
-bool pa_insert(PackedAttacks* ph, int id, double hp);
-bool pa_has(PackedAttacks* ph, int id);
-bool pa_remove(PackedAttacks* ph, int id);
-void pa_free(PackedAttacks* ph);
-void pa_print(PackedAttacks* ph);
+bool pa_init(PackedAttacks *pa, int capacity);
+bool pa_insert(PackedAttacks* pa, int id, double dmg);
+bool pa_has(PackedAttacks* pa, int id);
+bool pa_remove(PackedAttacks* pa, int id);
+void pa_free(PackedAttacks* pa);
+void pa_print(PackedAttacks* pa);
