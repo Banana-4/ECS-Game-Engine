@@ -13,7 +13,7 @@ typedef struct {
 } PackedEntities;
 
 bool pe_init(PackedEntities* pe, int capacity);
-bool pe_push(PackedEntities* pe, int id, unsigned mask);
+bool pe_insert(PackedEntities* pe, int id, unsigned mask);
 bool pe_remove(PackedEntities* pe, int id);
 void pe_free(PackedEntities* pe);
 void pe_print(PackedEntities* pe);
@@ -29,7 +29,7 @@ typedef struct {
 } PackedPositions;
 
 bool pp_init(PackedPositions* pp, int capacity);
-bool pp_push(PackedPositions* pp, int id, int x, int y);
+bool pp_insert(PackedPositions* pp, int id, int x, int y);
 
 bool pp_has(PackedPositions* pp, int id);
 
@@ -49,7 +49,7 @@ typedef struct {
 } PackedHealths;
 
 bool ph_init(PackedHealths* ph, int capacity);
-bool ph_push(PackedHealths* ph, int id, double hp);
+bool ph_insert(PackedHealths* ph, int id, double hp);
 bool ph_has(PackedHealths* ph, int id);
 bool ph_remove(PackedHealths* ph, int id);
 void ph_free(PackedHealths* ph);
@@ -67,7 +67,7 @@ typedef struct {
 } PackedVelocities;
 
 bool pv_init(PackedVelocities* pv, int capacity);
-bool pv_push(PackedVelocities* pv, int id, int x, int y);
+bool pv_insert(PackedVelocities* pv, int id, int x, int y);
 bool pv_has(PackedVelocities* pv, int id);
 bool pv_remove(PackedVelocities* pv, int id);
 void pv_free(PackedVelocities* pv);
@@ -84,7 +84,7 @@ typedef struct {
 } PackedSprites;
 
 bool ps_init(PackedSprites* ph, int capacity);
-bool ps_push(PackedSprites* ph, int id, double hp);
+bool ps_insert(PackedSprites* ph, int id, double hp);
 bool ps_has(PackedSprites* ph, int id);
 bool ps_remove(PackedSprites* ph, int id);
 void ps_free(PackedSprites* ph);
@@ -101,7 +101,7 @@ typedef struct {
 } PackedAttacks;
 
 bool pa_init(PackedAttacks *ph, int capacity);
-bool pa_push(PackedAttacks* ph, int id, double hp);
+bool pa_insert(PackedAttacks* ph, int id, double hp);
 bool pa_has(PackedAttacks* ph, int id);
 bool pa_remove(PackedAttacks* ph, int id);
 void pa_free(PackedAttacks* ph);
