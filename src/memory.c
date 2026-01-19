@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 bool pp_init(PackedPositions* pp, int capacity) {
-  if (!pp || capacity <= 0) {
+  if (capacity <= 0) {
     return false;
   }
   pp->x = (int*)malloc(sizeof(int) * capacity);
@@ -25,44 +25,37 @@ bool pp_init(PackedPositions* pp, int capacity) {
   for (int i = 0; i < MAX_ENTITIES; i++) 
     pp->id_map[i] = -1;
 
-  pa->capacity = capacity;
-  pa->size = 0;
+  pp->capacity = capacity;
+  pp->size = 0;
 
   return true;
 }
 
-bool pp_push(PackedPositions* pp, int id, int x, int y) {
-  if(!pp->x || !pp->y) {
-    return false;
-  }
-
+bool pp_insert(PackedPositions* pp, int id, int x, int y) {
   if(pp->size == pp->capacity) {
     return false;
   }
-  
-  pp->x[pp->size] = x;
-  pp->y[pp->size] = y;
-  
-  pp->cmp_id[pp->size] = id;
-  pp->id_map[id] = pp->size;
-
-  pp->size++;
-
+  int idx = pp->id_map[id];
+  if(idx == -1) {
+      pp->x[pp->size] = x;
+      pp->y[pp->size] = y;
+      pp->cmp_id[pp->size] = id;
+      pp->id_map[id] = pp->size;
+      pp->size++;
+  } else {
+    pp->x[idx] = x;
+    pp->y[idx] = y;
+  }
   return true;
 
 }
 
 bool pp_has(PackedPositions* pp, int id) {
-  if(!pp) return false;
   return (pp->id_map[id] != -1);
 }
 
 
 bool pp_remove(PackedPositions* pp, int id) {
-  if(!pp || !pp->x || !pp->y) {
-    return false;
-  }
-  
   int idx = pp->id_map[id];
   if (idx == -1) {
     return false;
@@ -82,7 +75,6 @@ bool pp_remove(PackedPositions* pp, int id) {
 }
 
 void pp_free(PackedPositions* pp) {
-  if (!pp) return;
   free(pp->x);
   free(pp->y);
   free(pp->cmp_id);
@@ -95,17 +87,14 @@ void pp_free(PackedPositions* pp) {
 }
 
 void pp_print(PackedPositions* pp) {
-  if(!pp) {
-    printf("No position components");
-    return;
-  }
-  for(int i = 0; i < pa->size; i++) {
-    printf("Index: %d, ID: %d, X: %d, Y: %d\n", i,pp->cmp_id[i] , pp->x[i], pp->y[i]);
+    printf("Size: %d, Capacity: %d\n", pp->size, pp->capacity);
+    for(int i = 0; i < pp->size; i++) {
+        printf("Index: %d, ID: %d, X: %d, Y: %d\n", i,pp->cmp_id[i] , pp->x[i], pp->y[i]);
   }
 }
 
 bool ph_init(PackedHealths* ph, int capacity) {
-  if(!ph || capacity <= 0) return false;
+  if(capacity <= 0) return false;
   ph->hp = (double*) malloc(sizeof(double)* capacity);
   if(!ph->hp) return false;
   ph->cmp_id = (int*) malloc(sizeof(int)* capacity);
@@ -121,24 +110,25 @@ bool ph_init(PackedHealths* ph, int capacity) {
   return true;
 }
 
-bool ph_push(PackedHealths* ph, int id, double hp) {
-  if(!ph || ph->capacity == ph->size) return false;
-  
-  ph->hp[ph->size] = hp;
-  ph->cmp_id[ph->size] = id;
-  ph->id_map[id] = ph->size;
-  ++ph->size;
+bool ph_insert(PackedHealths* ph, int id, double hp) {
+  if(ph->capacity == ph->size) return false;
+  int idx = ph->id_map[id];
+  if( idx == -1 ) {
+      ph->hp[ph->size] = hp;
+      ph->cmp_id[ph->size] = id;
+      ph->id_map[id] = ph->size;
+      ++ph->size;
+  } else {
+      ph->hp[idx] = hp;
+  }
   return true;
 }
 
 bool ph_has(PackedHealths* ph, int id) {
-  if(!ph) return false;
   return (ph->id_map[id] != -1);
 }
 
 bool ph_remove(PackedHealths* ph, int id) {
-  if(!ph) return false;
-  
   int idx = ph->id_map[id];
   if (idx == -1) return false;
   ph->size--;
@@ -154,7 +144,6 @@ bool ph_remove(PackedHealths* ph, int id) {
 }
 
 void ph_free(PackedHealths* ph) {
-  if(!ph) return;
   free(ph->hp);
   free(ph->cmp_id);
   ph->cmp_id = NULL;
@@ -164,24 +153,19 @@ void ph_free(PackedHealths* ph) {
 }
 
 void ph_print(PackedHealths* ph) {
-  if(!ph) {
-    printf("No health components");
-    return;
-  }
-
-  for (int i = 0; i < ph->size; ++i)
-    printf("Index: %d, ID: %d, HP: %f\n", i, ph->cmp_id[i], ph->hp[i]);
+    printf("Size: %d, Capacity: %d\n", ph->size, ph->capacity);
+    for (int i = 0; i < ph->size; ++i)
+        printf("Index: %d, ID: %d, HP: %f\n", i, ph->cmp_id[i], ph->hp[i]);
 }
 
 
 bool pe_init(PackedEntities* pe, int capacity) {
-  if(!pe) return false;
   pe->id = (int*)malloc(sizeof(int) * capacity);
   if(!pe->id) return false;
   pe->cmp_mask = (unsigned*)malloc(sizeof(unsigned) * capacity);
   if(!pe->cmp_mask) {
     free(pe->id);
-    pe->id = NULL:
+    pe->id = NULL;
     return false;
   }
   pe->capacity = capacity;
@@ -191,20 +175,21 @@ bool pe_init(PackedEntities* pe, int capacity) {
   }
 }
 
-bool pe_push(PackedEntities* pe, int id, unsigned mask) {
-  if(!pe) return false;
+bool pe_insert(PackedEntities* pe, int id, unsigned mask) {
   if(pe->size == pe->capacity) return false;
-
-  pe->id[pe->size] = id;
-  pe->cmp_mask[pe->size] = mask;
-  pe->id_map[id] = pe->size;
-  pe->size++;
-
+  int idx = pe->id_map[id];
+  if (idx == -1) {
+      pe->id[pe->size] = id;
+      pe->cmp_mask[pe->size] = mask;
+      pe->id_map[id] = pe->size;
+      pe->size++;
+  } else {
+      pe->cmp_mask[idx] = mask;
+  }
+  return true;
 }
 
 bool pe_remove(PackedEntities* pe, int id) {
-  if(!pe) return false;
-
 
   int idx = pe->id_map[id];
   if(idx == -1) return false;
@@ -222,26 +207,22 @@ bool pe_remove(PackedEntities* pe, int id) {
 }
 
 void pe_free(PackedEntities* pe) {
-  if(!pe) return;
-  if(pe->id){
     free(pe->id);
     pe->id = NULL;
-  }
-  if(pe->cmp_mask) {
     free(pe->cmp_mask);
     pe->cmp_mask = NULL;
-  }
-  pe->size = 0;
-  pe->capacity = 0;
-  for(int i = 0; i < MAX_ENTITIES; ++i) {
-    pe->id_map[i] = -1;
-  }
+    pe->size = 0;
+    pe->capacity = 0;
+    for(int i = 0; i < MAX_ENTITIES; ++i) {
+        pe->id_map[i] = -1;
+    }
 }
 
-void pe_print(PackedEntities* pe) {
-  for(int i = 0; i < pe->size; ++i) {
-    printf("INDEX: %d, ID: %d, MASK: %d\n", i, pe->id[i], pe->cmp_mask[i]);
-  }
+void pe_print(PackedEntities *pe) {
+    printf("Size: %d, Capacity: %d\n", pe->size, pe->capacity);
+    for(int i = 0; i < pe->size; ++i) {
+        printf("INDEX: %d, ID: %d, MASK: %d\n", i, pe->id[i], pe->cmp_mask[i]);
+    }
 }
 
 
