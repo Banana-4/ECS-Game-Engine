@@ -75,20 +75,20 @@ void pv_print(PackedVelocities* pv);
 
 
 typedef struct {
-  double* sprite;
+  char* ascii;
   int capacity;
   int size;
 
   int* cmp_id;
   int id_map[MAX_ENTITIES];
-} PackedSprites;
+} PackedASCII;
 
-bool ps_init(PackedSprites* ph, int capacity);
-bool ps_insert(PackedSprites* ph, int id, double hp);
-bool ps_has(PackedSprites* ph, int id);
-bool ps_remove(PackedSprites* ph, int id);
-void ps_free(PackedSprites* ph);
-void ps_print(PackedSprites* ph);
+bool pas_init(PackedASCII* pas, int capacity);
+bool pas_insert(PackedASCII* pas, int id, char ch);
+bool pas_has(PackedASCII* pas, int id);
+bool pas_remove(PackedASCII* pas, int id);
+void pas_free(PackedASCII* pas);
+void pas_print(PackedASCII* pas);
 
 
 typedef struct {
