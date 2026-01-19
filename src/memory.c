@@ -1,4 +1,6 @@
 #include "../include/memory.h"
+#include <cstdlib>
+#include <stdlib.h>
 
 bool pp_init(PackedPositions* pp, int capacity) {
   if (!pp || capacity <= 0) {
@@ -30,7 +32,7 @@ bool pp_init(PackedPositions* pp, int capacity) {
 }
 
 bool pp_push(PackedPositions* pp, int id, int x, int y) {
-  if(!pp->x || !p->y) {
+  if(!pp->x || !pp->y) {
     return false;
   }
 
@@ -237,10 +239,94 @@ void pe_free(PackedEntities* pe) {
 }
 
 void pe_print(PackedEntities* pe) {
-  if(!pe) print("No Entities.\n");
   for(int i = 0; i < pe->size; ++i) {
     printf("INDEX: %d, ID: %d, MASK: %d\n", i, pe->id[i], pe->cmp_mask[i]);
   }
 }
 
 
+bool pv_init(PackedVelocities *pv, int capacity) {
+  if (capacity <= 0)
+    return false;
+  pv->x = (int *)malloc(sizeof(int) * capacity);
+  if (!pv->x) {
+      return false;
+  }
+  pv->y = (int *)malloc(sizeof(int) * capacity);
+  if (!pv->y) {
+    free(pv->x);
+    pv->x = NULL;
+    return false;
+  }
+  pv->cmp_id = (int *)malloc(sizeof(int) * capacity);
+  if (!pv->cmp_id) {
+    free(pv->x);
+    free(pv->y);
+    pv->x = NULL;
+    pv->y = NULL;
+    return false;
+  }
+  pv->capacity = capacity;
+  pv->size = 0;
+  for (int i = 0; i < MAX_ENTITIES; ++i) {
+      pv->id_map[i] = -1;
+  }
+  return true;
+}
+
+bool pv_push(PackedVelocities *pv, int id, int x, int y) {
+  if (pv->size == pv->capacity) {
+      return false;
+  }
+  int idx = pv->id_map[id];
+  if (idx == -1) {
+    pv->x[pv->size] = x;
+    pv->y[pv->size] = y;
+    pv->cmp_id[pv->size] = id;
+    pv->id_map[id] = pv->size;
+    pv->size++;
+  } else {
+    pv->x[idx] = x;
+    pv->y[idx] = y;
+    pv->size++;
+  }
+  return true;
+}
+
+bool pv_remove(PackedVelocities *pv, int id) {
+  int idx = pv->id_map[id];
+  if (idx == -1) {
+      return false;
+  }
+  pv->size--;
+  int lastId = pv->cmp_id[pv->size];
+  pv->x[idx] = pv->x[pv->size];
+  pv->y[idx] = pv->y[pv->size];
+  pv->cmp_id[idx] = lastId;
+  pv->id_map[id] = -1;
+  pv->id_map[lastId] = idx;
+  return true;
+}
+
+bool pv_has(PackedVelocities *pv, int id) { return (pv->id_map[id] != -1); }
+
+void pv_free(PackedVelocities *pv) {
+  free(pv->x);
+  free(pv->y);
+  free(pv->cmp_id);
+  pv->size = 0;
+  pv->capacity = 0;
+  pv->cmp_id = NULL;
+  pv->x = NULL;
+  pv->y = NULL;
+  for (int i = 0; i < MAX_ENTITIES; ++i) {
+      pv->id_map[i] = -1;
+  }
+}
+
+void pv_print(PackedVelocities *pv) {
+    printf("Size: %d, Capacity: %d \n", pv->size, pv->capacity);
+    for(int i = 0; i < pv->size; ++i) {
+        printf("INDEX: %d, ID: %d, Speed X: %d, Speed Y: %d, \n", i, pv->cmp_id[i], pv->x[i], pv->y[i]);
+  }
+}
