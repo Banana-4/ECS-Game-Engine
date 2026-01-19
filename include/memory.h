@@ -54,3 +54,55 @@ bool ph_has(PackedHealths* ph, int id);
 bool ph_remove(PackedHealths* ph, int id);
 void ph_free(PackedHealths* ph);
 void ph_print(PackedHealths* ph);
+
+typedef struct {
+  int *x;
+  int *y;
+
+  int capacity;
+  int size;
+
+  int* cmp_id;
+  int id_map[MAX_ENTITIES];
+} PackedVelocities;
+
+bool pv_init(PackedVelocities* pv, int capacity);
+bool pv_push(PackedVelocities* pv, int id, int x, int y);
+bool pv_has(PackedVelocities* pv, int id);
+bool pv_remove(PackedVelocities* pv, int id);
+void pv_free(PackedVelocities* pv);
+void pv_print(PackedVelocities* pv);
+
+
+typedef struct {
+  double* sprite;
+  int capacity;
+  int size;
+
+  int* cmp_id;
+  int id_map[MAX_ENTITIES];
+} PackedSprites;
+
+bool ps_init(PackedSprites* ph, int capacity);
+bool ps_push(PackedSprites* ph, int id, double hp);
+bool ps_has(PackedSprites* ph, int id);
+bool ps_remove(PackedSprites* ph, int id);
+void ps_free(PackedSprites* ph);
+void ps_print(PackedSprites* ph);
+
+
+typedef struct {
+  double* dmg;
+  int capacity;
+  int size;
+
+  int *cmp_id;
+  int id_map[MAX_ENTITIES];
+} PackedAttacks;
+
+bool pa_init(PackedAttacks *ph, int capacity);
+bool pa_push(PackedAttacks* ph, int id, double hp);
+bool pa_has(PackedAttacks* ph, int id);
+bool pa_remove(PackedAttacks* ph, int id);
+void pa_free(PackedAttacks* ph);
+void pa_print(PackedAttacks* ph);
