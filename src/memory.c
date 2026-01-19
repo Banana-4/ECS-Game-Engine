@@ -255,7 +255,7 @@ bool pv_init(PackedVelocities *pv, int capacity) {
   return true;
 }
 
-bool pv_push(PackedVelocities *pv, int id, int x, int y) {
+bool pv_insert(PackedVelocities *pv, int id, int x, int y) {
   if (pv->size == pv->capacity) {
       return false;
   }
@@ -378,4 +378,78 @@ void pas_print(PackedASCII *pas) {
     for(int i = 0; i < pas->size; ++i) {
         printf("INDEX: %d, ID: %d, ASCII Art: %c \n", i, pas->cmp_id[i], pas->ascii[i]);
   }
+}
+
+bool pa_init(PackedAttacks *pa, int capacity) {
+    if (!pa || capacity <= 0) return false;
+    pa->dmg = (double *)malloc(sizeof(double) * capacity);
+    if (!pa->dmg)
+      return false;
+    pa->cmp_id = (int *)malloc(sizeof(int) * capacity);
+    if (!pa->cmp_id) {
+      free(pa->dmg);
+      pa->dmg = NULL;
+      return false;
+    }
+    pa->size = 0;
+    pa->capacity = capacity;
+    for (int i = 0; i < MAX_ENTITIES; ++i) {
+        pa->id_map[i] = -1;
+    }
+    return true;
+}
+
+bool pa_insert(PackedAttacks *pa, int id, double dmg) {
+    if (pa->size == pa->capacity) {
+      return false;
+  }
+    int idx = pa->id_map[id];
+    if (idx == -1) {
+      pa->dmg[pa->size] = dmg;
+      pa->cmp_id[pa->size] = id;
+      pa->id_map[id] = pa->size;
+      pa->size++;
+    } else {
+        pa->dmg[idx] = dmg;
+    }
+    return true;
+
+}
+
+bool pa_has(PackedAttacks *pa, int id) {
+   return (pa->id_map[id] != -1);
+
+}
+
+bool pa_remove(PackedAttacks *pa, int id) {
+    int idx = pa->id_map[id];
+    if (id == -1)
+        return false;
+  pa->size--;
+  int lastId = pa->cmp_id[pa->size];
+  pa->dmg[idx] = pa->dmg[pa->size];
+  pa->cmp_id[idx] = lastId;
+  pa->id_map[id] = -1;
+  pa->id_map[lastId] = idx;
+  return true;
+}
+
+void pa_free(PackedAttacks *pa) {
+  free(pa->dmg);
+  pa->dmg = NULL;
+  free(pa->cmp_id);
+  pa->cmp_id = NULL;
+  pa->size = 0;
+  pa->capacity = 0;
+  for (int i = 0; i < MAX_ENTITIES; i++) {
+      pa->id_map[i] = -1;
+  }
+}
+
+void pa_print(PackedAttacks *pa) {
+  printf("Size: %d, Capacity: %d \n", pa->size, pa->capacity);
+    for(int i = 0; i < pa->size; ++i) {
+        printf("INDEX: %d, ID: %d, DMG: %f \n", i, pa->cmp_id[i], pa->dmg[i]);
+  }
+
 }
