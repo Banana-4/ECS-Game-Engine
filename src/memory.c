@@ -311,3 +311,71 @@ void pv_print(PackedVelocities *pv) {
         printf("INDEX: %d, ID: %d, Speed X: %d, Speed Y: %d, \n", i, pv->cmp_id[i], pv->x[i], pv->y[i]);
   }
 }
+
+
+bool pas_init(PackedASCII *pas, int capacity) {
+  if (!pas || capacity <= 0)
+    return false;
+  pas->ascii = (char *)malloc(sizeof(char) * capacity);
+  if (!pas->ascii)
+    return false;
+  pas->cmp_id = (int *)malloc(sizeof(int) * capacity);
+  if (!pas->cmp_id) {
+    free(pas->ascii);
+    pas->ascii = NULL;
+    return false;
+  }
+  pas->size = 0;
+  pas->capacity = capacity;
+  for (int i = 0; i < MAX_ENTITIES; i++) {
+      pas->id_map[i] = -1;
+  }
+  return true;
+}
+
+bool pas_insert(PackedASCII *pas, int id, char ch) {
+  if (pas->size == pas->capacity) {
+      return false;
+  }
+    int idx = pas->id_map[id];
+    if (idx == -1) {
+      pas->ascii[pas->size] = ch;
+      pas->cmp_id[pas->size] = id;
+      pas->id_map[id] = pas->size;
+      pas->size++;
+    } else {
+        pas->ascii[idx] = ch;
+    }
+    return true;
+}
+
+bool pas_remove(PackedASCII *pas, int id) {
+  int idx = pas->id_map[id];
+  if (id == -1)
+    return false;
+  pas->size--;
+  int lastId = pas->cmp_id[pas->size];
+  pas->ascii[idx] = pas->ascii[pas->size];
+  pas->cmp_id[idx] = lastId;
+  pas->id_map[id] = -1;
+  pas->id_map[lastId] = idx;
+  return true;
+}
+
+bool pas_has(PackedASCII *pas, int id) { return (pas->id_map[id] != -1); }
+
+void pas_free(PackedASCII *pas) {
+  free(pas->ascii);
+  pas->ascii = NULL;
+  free(pas->cmp_id);
+  pas->cmp_id = NULL;
+  pas->size = 0;
+  pas->capacity = 0;
+}
+
+void pas_print(PackedASCII *pas) {
+    printf("Size: %d, Capacity: %d \n", pas->size, pas->capacity);
+    for(int i = 0; i < pas->size; ++i) {
+        printf("INDEX: %d, ID: %d, ASCII Art: %c \n", i, pas->cmp_id[i], pas->ascii[i]);
+  }
+}
