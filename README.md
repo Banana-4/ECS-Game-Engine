@@ -66,8 +66,9 @@ A Entity without any meaningless data is useless for a system whose purpose is t
 The user is expected to provide on Entity creation the types of components that the entity has.
 
 ## Data:
-```
+
 ECS deals with Entities, that is table data:
+```
 | IDs     | COMPONENT | COMPONENT | COMPONENT |
 | KEY     | DATA      | DATA	    | DATA      |
 | KEY     | DATA      | -         | DATA      |
