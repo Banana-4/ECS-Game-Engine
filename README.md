@@ -59,12 +59,46 @@ A game object can be modeled like a database record.
 The whole game can be viewed like a interactive database system that processes data in real time to create a experience for the users.
 
 
+## Uses:
+THe main purpose of the ECS engine is to provide Entity storage in memory that is organized for processing in groups. To achive this the engine needs to provide the user with the ability to create and delete Entities, iterate over all entities, give acsess to systems that allowe the user to transform the data.
+The system lets the use decide how much memory he wants to use for the data.
+A Entity without any meaningless data is useless for a system whose purpose is to process data. That leads that the invariant of the system is that all Entities will have data associated with them.
+The user is expected to provide on Entity creation the types of components that the entity has.
+
+## Data:
+ECS deals with Entities, that is table data:
+| IDs     | COMPONENT | COMPONENT | COMPONENT |
+| KEY     | DATA      | DATA	    | DATA      |
+| KEY     | DATA      | -         | DATA      |
+
+The key represents the owner of the data, ID of the Entity.
+A component store is a whole column of data.
+In a ECS Engine the data is bulk processed, to reduce the amount of main memory reads and copys to the CPU cache.
+In ECS the table is broken down into individual columns with ownership.
+The individual columns are represented in memory as Structs of Arrays called stores.
+
+
 ## Modules:
 
+### ECS:
+
+This module is the point where all the other modules are joined to form the complete data engine. The main responsibility of the ECS module is to create the working structure of the system and to be the place from which the engine starts. 
+The module provides the interface for the engine, that is it makes the engine usable.
+#### Interface:
+  bool ecs_init(int capacity);
+  void ecs_stop();
+
+  bool ecs_create(int cmpMask);
+  bool ecs_remove(int id);
+
+  EnIter* ecs_keys();
+  void ecs_next(EnIter* iter);
+  int ecs_key(EnIter* iter);
+  void ecs_freeIter(EnIter* iter);
 
 ### Memory:
 
-This module is a subsystem that is responsible for allocating and freeing memory, organizing data into memory layout that is cache-friendly and provides fast access to data.
+This module is a subsystem that is responsible for allocating and freeing memory, organizing data using cache-friendly memory layout and providing fast access to it.
 It uses Structs of Arrays as the primary data storing unit.
 Each SoA is stores a single type of components with the ownership data.
 The component data is stored into packed arrays and the ownership data is stored into a sparse array, where each index position represents the ID and the value at each index is the index of the component that belongs to that ID.
@@ -81,7 +115,7 @@ The memory system has a clean and simple interface for each SoA:
 
 Subsystem for creating IDs and associating them with components.
 The subsystems core responsibility is to ensure the creation of unique whole number IDs in inclusive range 0 to MAX_ENTITIES, while allowing reuse of decommissioned IDs.
-Reuse of decommissioned IDs is achieved through their storage into a module managed stack.
+Decommisiond IDs can be reused. For that purpose each reomved ID is pushed onto a stack.
 The module is also responsible for providing access to the Entity store for iteration.
 
 Data owned:
@@ -103,18 +137,18 @@ Data owned:
   1. get_id - returns the next available ID, popping from the stack or returning the next integer in line. If the max number of IDs is already given it returns -1.
 
 ### Components:
-Header file where components are defined, it provides a template for instanciating diffrent component objects.
+
+This module is the owner of all components stores. 
+
+The responsibilities are:
+1. Initilization of all the stores.
+2. Providing accesess to each store.
+3. Allowing data to be stored in a store.
+4. Deallocating memory of the stores, removing them. 
+
 
 ### Systems:
 Logical subsystem responsiable for logical data manipulation.
-
-
-### Input:
-Susbsystem that manages interactions with the users of the systems by providing a interface for accepting input devices data and processing them into a commands.
-
-### Render:
-Data visualziation subsystem. Responsiable for displaying drawable entities visualy on the screen.
-
 
 
 ## File Organization:
@@ -157,54 +191,4 @@ ecs-engine/
 
 ## Moduls Interactions:
 
-## ECS:
-
-The ECS modul interacts directly with the systems modul, inderectly it interacts through the systems modul with a;; the other moduls.
-
-## Systems:
-
-This modul interacts with the ECS modul through function return values, signals that help the ECS decide what system to call next, should it stop...
-Systems modul interacts with the memory subsystem through the memorys interface, the main reason for interacting with memory is to get data and send data to be stored.
-
-## Memory:
-
-This modul interacts only with the system modul by providing data to it or receving data from the systems to store.
-
-## Input:
-
-This modul interacts only with the ECS modul by returning commands that represent a sequence of systems calls.
-
-## Render:
-
-Render is a isolated systems modul that is responsiable for drawing the entities on the screen so its main interaction is with the memory same like the systems modul.
-
-## How the data is structured:
-
-### Entity:
-A simple struct that has two data members a id that represents a index that is used to accses its components in the array.
-A integer mask whose set bits represent the components that the entity has.
-
-### Components:
-Structs that have a smeantic a name and hold the data that define a property. Example positon component:
-Name: Position
-Data:
-int x - x coordinate
-int y -  y coordiante
-
-### Systems:
-
-Functions that return a optional value that represents a signal for the ECS modul, take no arguments or take a entity argument. The component set with which they operate is hard coded inside them (for now).
-
-### Input:
-
-Functions that take input device data and convert the input into a command.
-
-### Render:
-
-Function that takes no arguments, goes through all entities drawing the entities that have draw component.
-
-## List of Systems:
-
-1. move_system(Entity e) - a system that moves a entity in 2d grid and checks for collisons uses a Entitys velocity component to update the state of the Entitys position component.
-2. attack_system(Entity source, Entity target) - a system that mainpulates the target entitys health component with the data from the source entitys attack component.
 
