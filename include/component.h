@@ -1,26 +1,31 @@
-typedef enum {
-  position = 1,
-  velocity = 2,
-  health = 4,
-  attack = 8,
-}ComponentsID;
+#include "memory.h"
 
-typedef struct {
-  int x;
-  int y;
-} Position;
+typedef struct ppData {
+    int *x;
+    int *y;
+}ppData;
+typedef struct pvData {
+    int *x;
+    int *y;
+}pvData;
 
-typedef struct {
-  int x;
-  int y;
-} Velocity;
+typedef struct phData {
+    double* hp;
+}phData;
 
-typedef struct {
-  double health;
-} Health;
+typedef struct paData {
+    double* attack;
+}paData;
 
-typedef struct {
-  double dmg;
-  int range;
-} Attack;
+typedef struct pasData {
+    char* ascii;
+}pasData;
 
+bool init_stores(int capacity);
+void free_stores();
+
+void get_postion(int id, ppData* out);
+void get_velocity(int id, pvData* out);
+void get_health(int id, phData* out);
+void get_attack(int id, paData* out);
+void get_ascii(int id, pasData* out);
