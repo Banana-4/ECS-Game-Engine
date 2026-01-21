@@ -1,4 +1,5 @@
 #include "../include/entity.h"
+
 PackedEntities* pe;
 
 static int freeIDsize = -1;
@@ -41,4 +42,44 @@ PackedEntities* get_entites() {
 void kill_entities() {
   pe_free(pe);
   free(pe);
+}
+
+
+EnIter* create_enIter() {
+  EnIter* iter = (EnIter*)malloc(sizeof(EnIter));
+  if (!iter) return NULL;
+  iter->id = pe->id;
+  iter->cmp_mask = pe->cmp_mask;
+  iter->pos = 0;
+  return iter;
+}
+bool next_enIter(EnIter* iter) {
+  if(iter->pos < pe->size) {
+    iter->id++;
+    iter->cmp_mask++;
+    iter->pos++;
+    return true;
+  }
+  
+   return false;
+}
+
+int id_enIter(EnIter* iter) {
+  if(iter) {
+    return *(iter->id);
+  }
+  return -1;
+}
+
+
+int mask_enIter(EnIter* iter) {
+   if(iter) {
+    return *(iter->cmp_mask);
+  }
+  return -1;
+}
+
+void free_enIter(EnIter* iter) {
+  free(iter);
+  iter = NULL;
 }
