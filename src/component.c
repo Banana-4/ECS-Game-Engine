@@ -5,7 +5,7 @@ PackedPositions* pp;
 PackedHealths* ph;
 PackedVelocities* pv;
 PackedAttacks *pa;
-PackedASCII* ps;
+PackedASCII* pas;
 
 
 
@@ -23,7 +23,7 @@ bool init_stores(int capacity) {
     ph_free(ph);
     return false;
   }
-  if (!pas_init(ps, capacity)) {
+  if (!pas_init(pas, capacity)) {
     pp_free(pp);
     ph_free(ph);
     pv_free(pv);
@@ -33,7 +33,7 @@ bool init_stores(int capacity) {
     pp_free(pp);
     ph_free(ph);
     pv_free(pv);
-    pas_free(ps);
+    pas_free(pas);
     return false;
   }
   return true;
@@ -43,7 +43,7 @@ void free_stores() {
   pp_free(pp);
   ph_free(ph);
   pv_free(pv);
-  pas_free(ps);
+  pas_free(pas);
   pa_free(pa);
 }
 
@@ -66,5 +66,5 @@ void get_attack(int id, paData* out) {
 }
 
 void get_ascii(int id, pasData* out) {
-  out->ascii = pas->ascii[pas->id_map[id]];
+  out->ascii = &pas->ascii[pas->id_map[id]];
 }
