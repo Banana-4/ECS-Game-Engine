@@ -14,7 +14,7 @@ typedef struct phData {
 }phData;
 
 typedef struct paData {
-    double* attack;
+    double* dmg;
 }paData;
 
 typedef struct pasData {
