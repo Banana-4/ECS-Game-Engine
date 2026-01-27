@@ -47,24 +47,42 @@ void free_stores() {
   pa_free(pa);
 }
 
+bool position_insert(int id, int x, int y) {
+   return pp_insert(pp, id, x, y);
+}
+
+bool velocity_insert(int id, int x, int y) {
+    return pv_insert(pv, id, x, y);
+}
+bool health_insert(int id, double hp) {
+     return ph_insert(ph, id, hp);
+}
+
+bool ascii_insert(int id, char ch){
+    return pas_insert(pas, id, ch);
+}
+bool attack_insert(int id, double dmg) {
+    return pa_insert(pa, id, dmg);
+}
+
 
 void get_postion(int id, ppData* out) {
-    out->x = &pp->x[pp->id_map[id]];
-    out->y = &pp->y[pp->id_map[id]];
+    out->x = pp->x[pp->id_map[id]];
+    out->y = pp->y[pp->id_map[id]];
 }
 void get_velocity(int id, pvData* out) {
-    out->x = &pv->x[pv->id_map[id]];
-    out->y = &pv->y[pv->id_map[id]];
+    out->x = pv->x[pv->id_map[id]];
+    out->y = pv->y[pv->id_map[id]];
 }
 
 void get_health(int id, phData* out) {
-  out->hp = &ph->hp[ph->id_map[id]];
+  out->hp = ph->hp[ph->id_map[id]];
 }
 
 void get_attack(int id, paData* out) {
-  out->dmg = &pa->dmg[pa->id_map[id]];
+  out->dmg = pa->dmg[pa->id_map[id]];
 }
 
 void get_ascii(int id, pasData* out) {
-  out->ascii = &pas->ascii[pas->id_map[id]];
+  out->ascii = pas->ascii[pas->id_map[id]];
 }
