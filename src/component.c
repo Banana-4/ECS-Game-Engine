@@ -1,5 +1,6 @@
 #include "../include/component.h"
-#include <stdlib.h>
+#include "../include/memory.h"
+#include <stdbool.h>
 
 PackedPositions* pp; 
 PackedHealths* ph;
@@ -47,42 +48,212 @@ void free_stores() {
   pa_free(pa);
 }
 
-bool position_insert(int id, int x, int y) {
-   return pp_insert(pp, id, x, y);
-}
+// insert and update data interface
 
-bool velocity_insert(int id, int x, int y) {
-    return pv_insert(pv, id, x, y);
-}
-bool health_insert(int id, double hp) {
-     return ph_insert(ph, id, hp);
-}
+bool position_insert(int id, int x, int y) { return pp_insert(pp, id, x, y); }
 
-bool ascii_insert(int id, char ch){
-    return pas_insert(pas, id, ch);
-}
-bool attack_insert(int id, double dmg) {
-    return pa_insert(pa, id, dmg);
-}
+bool velocity_insert(int id, int x, int y) { return pv_insert(pv, id, x, y); }
+
+bool health_insert(int id, double hp) { return ph_insert(ph, id, hp); }
+
+bool ascii_insert(int id, char ch) { return pas_insert(pas, id, ch); }
+
+bool attack_insert(int id, double dmg) { return pa_insert(pa, id, dmg); }
 
 
-void get_postion(int id, ppData* out) {
-    out->x = pp->x[pp->id_map[id]];
-    out->y = pp->y[pp->id_map[id]];
-}
-void get_velocity(int id, pvData* out) {
-    out->x = pv->x[pv->id_map[id]];
-    out->y = pv->y[pv->id_map[id]];
+//remove interface
+
+bool position_remove(int id) { return pp_remove(pp, id); }
+
+bool velocity_remove(int id) { return pv_remove(pv, id); }
+
+bool health_remove(int id) { return ph_remove(ph,id); }
+
+bool ascii_remove(int id) { return pas_remove(pas, id); }
+
+bool attack_remove(int id) { return pa_remove(pa,id); }
+
+
+//iteration interface
+
+
+//position
+void posIter_init(posIter *iter) {
+    if (!iter) {
+        return;
+    }
+    iter->x = pp->x;
+    iter->y = pp->y;
+    iter->base.cmp_id = pp->cmp_id;
+    iter->base.left = pp->size;
 }
 
-void get_health(int id, phData* out) {
-  out->hp = ph->hp[ph->id_map[id]];
+bool posIter_next(posIter *iter) {
+    if (!iter || iter->base.left == 0) {
+        return false;
+    }
+
+    iter->x++;
+    iter->y++;
+    iter->base.cmp_id++;
+    return --iter->base.left;
 }
 
-void get_attack(int id, paData* out) {
-  out->dmg = pa->dmg[pa->id_map[id]];
+bool posIter_getX(posIter *iter, int *out) {
+    if (!iter || iter->base.left == 0)
+        return false;
+    *out = *iter->x;
+    return true;
 }
 
-void get_ascii(int id, pasData* out) {
-  out->ascii = pas->ascii[pas->id_map[id]];
+bool posIter_getY(posIter *iter, int *out) {
+    if (!iter || iter->base.left == 0)
+        return false;
+    *out = *iter->y;
+    return true;
+}
+
+bool posIter_getID(posIter *iter, int *out) {
+    if (!iter || iter->base.left == 0)
+        return false;
+    *out = *iter->base.cmp_id;
+    return true;
+}
+
+//velocity
+void velIter_init(velIter *iter) {
+    if (!iter) {
+        return;
+    }
+    iter->x = pp->x;
+    iter->y = pp->y;
+    iter->base.cmp_id = pp->cmp_id;
+    iter->base.left = pp->size;
+}
+
+bool velIter_next(velIter *iter) {
+    if (!iter || iter->base.left == 0) {
+       return false;
+    }
+
+    iter->x++;
+    iter->y++;
+    iter->base.cmp_id++;
+    return --iter->base.left;
+}
+
+bool velIter_getX(velIter *iter, int *out) {
+    if (!iter || iter->base.left == 0)
+      return false;
+    *out = *iter->x;
+    return true;
+}
+bool velIter_getY(velIter *iter, int *out) {
+    if (!iter || iter->base.left == 0)
+      return false;
+    *out = *iter->y;
+    return true;
+}
+bool velIter_getID(velIter *iter, int *out) {
+    if (!iter || iter->base.left == 0)
+      return false;
+    *out = *iter->base.cmp_id;
+    return true;
+}
+
+//health
+
+void hpIter_init(hpIter *iter) {
+    if (!iter)
+        return;
+    iter->val = ph->hp;
+    iter->base.cmp_id = ph->cmp_id;
+    iter->base.left = ph->size;
+}
+
+bool hpIter_next(hpIter *iter) {
+    if (!iter || iter->base.left == 0)
+        return false;
+
+
+    iter->val++;
+    iter->base.cmp_id++;
+    return --iter->base.left;
+}
+
+bool hpIter_getHP(hpIter *iter, double *out) {
+    if (!iter || iter->base.left == 0)
+        return false;
+    *out = *iter->val;
+    return true;
+}
+
+bool hpIter_getID(hpIter *iter, int *out) {
+    if (!iter || iter->base.left == 0)
+        return false;
+    *out = *iter->base.cmp_id;
+    return true;
+}
+
+// Attack
+
+void attIter_init(attIter *iter) {
+    if (!iter)
+        return;
+    iter->val = pa->dmg;
+    iter->base.cmp_id = pa->cmp_id;
+    iter->base.left = pa->size;
+}
+bool attIter_next(attIter *iter) {
+    if (!iter || iter->base.left == 0)
+        return false;
+    iter->val++;
+    iter->base.cmp_id++;
+    return --iter->base.left;
+}
+
+bool attIter_getDmg(attIter *iter, double *out) {
+    if (!iter || iter->base.left == 0)
+        return false;
+    *out = *iter->val;
+    return true;
+}
+
+bool attIter_getID(attIter *iter, int *out) {
+    if (!iter || iter->base.left == 0)
+        return false;
+    *out = *iter->base.cmp_id;
+    return true;
+}
+
+
+//ASCII ART
+
+void pasIter_init(pasIter *iter) {
+    if (!iter)
+        return;
+    iter->val = pas->ascii;
+    iter->base.cmp_id = pas->cmp_id;
+    iter->base.left = pas->size;
+}
+
+bool pasIter_next(pasIter *iter) {
+     if (!iter || iter->base.left == 0)
+        return false;
+    iter->val++;
+    iter->base.cmp_id++;
+    return --iter->base.left;
+}
+bool pasIter_getCh(pasIter *iter, char *out) {
+    if (!iter || iter->base.left == 0)
+        return false;
+    *out = *iter->val;
+    return true;
+}
+
+bool pasIter_getID(pasIter *iter, int *out) {
+    if (!iter || iter->base.left == 0)
+        return false;
+    *out = *iter->base.cmp_id;
+    return true;
 }
