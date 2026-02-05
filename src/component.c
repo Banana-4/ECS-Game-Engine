@@ -1,6 +1,7 @@
 #include "../include/component.h"
 #include "../include/memory.h"
 #include <stdbool.h>
+#include <stdlib.h>
 
 PackedPositions* pp; 
 PackedHealths* ph;
@@ -12,24 +13,29 @@ PackedASCII* pas;
 
 
 bool init_stores(int capacity) {
+  pp = (PackedPositions*)malloc(sizeof(PackedPositions));
   if (!pp_init(pp, capacity)) {
     return false;
   }
+  ph = (PackedHealths*)malloc(sizeof(PackedHealths));
   if(!ph_init(ph, capacity)) {
     pp_free(pp);
     return false;
   }
+  pv = (PackedVelocities*)malloc(sizeof(PackedVelocities));
   if (!pv_init(pv, capacity)) {
     pp_free(pp);
     ph_free(ph);
     return false;
   }
+  pas = (PackedASCII*)malloc(sizeof(PackedASCII));
   if (!pas_init(pas, capacity)) {
     pp_free(pp);
     ph_free(ph);
     pv_free(pv);
     return false;
   }
+  pa = (PackedAttacks*)malloc(sizeof(PackedAttacks));
   if (!pa_init(pa, capacity)) {
     pp_free(pp);
     ph_free(ph);
@@ -256,4 +262,19 @@ bool pasIter_getID(pasIter *iter, int *out) {
         return false;
     *out = *iter->base.cmp_id;
     return true;
+}
+
+// debug
+
+void print_all_stores() {
+    printf("Positions:\n");
+    pp_print(pp);
+    printf("Velocities:\n");
+    pv_print(pv);
+    printf("Healtsh:\n");
+    ph_print(ph);
+    printf("Attacks:\n");
+    pa_print(pa);
+    printf("ASCII:\n");
+    pas_print(pas);
 }
