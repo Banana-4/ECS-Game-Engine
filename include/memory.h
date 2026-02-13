@@ -2,7 +2,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define MAX_ENTITIES 10000
+
 // Stores
+struct PackedEntities {
+  int* id;
+  unsigned* cmp_mask;
+  size_t capacity;
+  size_t size;
+
+  int id_map[MAX_ENTITIES];
+};
+
+struct PackedVec2Int {
+  int* x;
+  int* y;
+  size_t capacity;
+  size_t size;
+
+  int* cmp_id;
+  int id_map[MAX_ENTITIES];
+};
+
+struct PackedDouble {
+  double* val;
+  size_t capacity;
+  size_t size;
+
+  int* cmp_id;
+  int id_map[MAX_ENTITIES];
+};
+
+struct PackedChar {
+  char* val;
+  size_t capacity;
+  size_t size;
+
+  int* cmp_id;
+  int id_map[MAX_ENTITIES];
+};
+
+
+// Stores types
 typedef struct PackedEntities PackedEntities;
 typedef struct PackedVec2Int PackedPositions;
 typedef struct PackedVec2Int PackedVelocities;
