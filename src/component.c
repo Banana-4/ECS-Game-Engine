@@ -98,7 +98,6 @@ bool posIter_next(posIter *iter) {
     if (!iter || iter->base.left == 0) {
         return false;
     }
-
     iter->x++;
     iter->y++;
     iter->base.cmp_id++;
@@ -108,7 +107,7 @@ bool posIter_next(posIter *iter) {
 bool posIter_getX(posIter *iter, int *out) {
     if (!iter || iter->base.left == 0)
         return false;
-    *out = *iter->x;
+    *out = *(iter->x);
     return true;
 }
 
@@ -172,7 +171,7 @@ bool velIter_getID(velIter *iter, int *out) {
 void hpIter_init(hpIter *iter) {
     if (!iter)
         return;
-    iter->val = ph->hp;
+    iter->val = ph->val;
     iter->base.cmp_id = ph->cmp_id;
     iter->base.left = ph->size;
 }
@@ -206,7 +205,7 @@ bool hpIter_getID(hpIter *iter, int *out) {
 void attIter_init(attIter *iter) {
     if (!iter)
         return;
-    iter->val = pa->dmg;
+    iter->val = pa->val;
     iter->base.cmp_id = pa->cmp_id;
     iter->base.left = pa->size;
 }
@@ -238,7 +237,7 @@ bool attIter_getID(attIter *iter, int *out) {
 void pasIter_init(pasIter *iter) {
     if (!iter)
         return;
-    iter->val = pas->ascii;
+    iter->val = pas->val;
     iter->base.cmp_id = pas->cmp_id;
     iter->base.left = pas->size;
 }
