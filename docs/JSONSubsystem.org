@@ -1,0 +1,88 @@
+
+* JSON Subsystem:
+This subsystem is a part of the systems module. It is responsible for allowing the ECS Engine to communicate with its environment.
+It outputes stores in JSON format to persistent storage, files.
+The subsystem is made from a set of functions. Each function handles one component store.
+
+** JSON Gramamr:
+#+source: JSON.org
+#+begin_quote
+<json>         ::= <object> | <array>
+
+<object>       ::= "{" <whitespace> "}" | "{" <members> "}"
+<members>      ::= <pair> | <pair> "," <members>
+<pair>         ::= <whitespace> <string> <whitespace> ":" <value>
+
+<array>        ::= "[" <whitespace> "]" | "[" <elements> "]"
+<elements>     ::= <value> | <value> "," <elements>
+
+<value>        ::= <string> | <number> | <object> | <array> | "true" | "false" | "null"
+
+<string>       ::= '"' <characters> '"'
+<characters>   ::= <char> <characters> | ""
+<char>         ::= <any_unicode_except_quote_or_backslash> | "\\" <escape>
+
+<number>       ::= <int> <frac> <exp>
+<int>          ::= <digit> | <onenine> <digits> | "-" <digit> | "-" <onenine> <digits>
+<digits>       ::= <digit> | <digit> <digits>
+<digit>        ::= "0" | <onenine>
+<onenine>      ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<frac>         ::= "" | "." <digits>
+<exp>          ::= "" | "e" <sign> <digits> | "E" <sign> <digits>
+<sign>         ::= "" | "+" | "-"
+
+<whitespace>   ::= "" | " " <whitespace> | "\n" <whitespace> | "\r" <whitespace> | "\t" <whitespace>
+
+#+end_quote
+
+** Store data in JSON:
+JSON for stores is structured as JSON of a array of componnets. Each componnet holds the data and the id.
+The only exception is the id store it just stores a list of id, integers.
+
+*** ID Store:
+#+begin_src javascript
+{
+    "store" : "id",
+    "id" : [id1, ...., idn]
+}
+
+#+end_src
+
+*** Example for Positions:
+#+begin_src javascript
+{
+    "store" : "positions",
+    "components" : [
+        {
+        "id" : id
+        "x" : x,
+        "y" : y
+            }, ....
+        ]
+}
+#+end_src
+
+** Functions:
+The function mirror the memory module functions:
+*** Examples:
+- pe_dump(PackedEntites *id);
+- pp_dump(PackedPositions *pp);
+- pv_dump(PackedVelocities *pv);
+
+** General Implementaion:
+Assumptions:
+1. There is not enough memory to hold all the stores and their JSON string representation in memory.
+2. Whole stores are outputed to files, there is no point update to files.
+3. All stores are saved t ofiles at once.
+4. The JSON is always correct, there is no write error.
+5. Writing to files overwrites them all old informations are lost.
+
+The functions write data directly to files.
+*** Pipeline:
+open file for writing
+write header data, { name : name ,
+write list start "components" : [
+iterate over a store,
+ for each iteartion add one json object to the componnets list.
+write ] } to close the json
+close the file
