@@ -1,0 +1,132 @@
+#+title: Json
+#+author: banana
+#+date: <2026-02-18 Wed>
+
+* JSON System:
+JSON System is a distributed system responsible for structured data storing and loading in JSON format.
+
+
+** JSON System distribution:
+1. Systems module.
+2. Entity module.
+
+** JSON Gramamr:
+#+source: JSON.org
+#+begin_quote
+<json>         ::= <object> | <array>
+
+<object>       ::= "{" <whitespace> "}" | "{" <members> "}"
+<members>      ::= <pair> | <pair> "," <members>
+<pair>         ::= <whitespace> <string> <whitespace> ":" <value>
+
+<array>        ::= "[" <whitespace> "]" | "[" <elements> "]"
+<elements>     ::= <value> | <value> "," <elements>
+
+<value>        ::= <string> | <number> | <object> | <array> | "true" | "false" | "null"
+
+<string>       ::= '"' <characters> '"'
+<characters>   ::= <char> <characters> | ""
+<char>         ::= <any_unicode_except_quote_or_backslash> | "\\" <escape>
+
+<number>       ::= <int> <frac> <exp>
+<int>          ::= <digit> | <onenine> <digits> | "-" <digit> | "-" <onenine> <digits>
+<digits>       ::= <digit> | <digit> <digits>
+<digit>        ::= "0" | <onenine>
+<onenine>      ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<frac>         ::= "" | "." <digits>
+<exp>          ::= "" | "e" <sign> <digits> | "E" <sign> <digits>
+<sign>         ::= "" | "+" | "-"
+
+<whitespace>   ::= "" | " " <whitespace> | "\n" <whitespace> | "\r" <whitespace> | "\t" <whitespace>
+
+#+end_quote
+
+** Systems module:
+This JSON system part is responsible for:
+1. Storing components data with ownership in JSON files on persistent storage.
+2. Loading data from JSON files into the components stores.
+
+Each component stores has its own separate JSON file.
+The dump operations are exception safe. The dump functions use a file buffer renaming pattern to achieve exception safety.
+
+The dump functions communicate with the rest of the ECS Engine by returning integer codes.
+
+*** Example for Positions:
+#+begin_src javascript
+{
+    "store" : "positions",
+    "components" : [
+        {
+        "id" : id
+        "x" : x,
+        "y" : y
+            }, ....
+        ]
+}
+#+end_src
+
+
+
+*** ID Store:
+#+begin_src javascript
+{
+    "store" : "id",
+    "id" : [id1, ...., idn]
+}
+
+#+end_src
+
+** Functions:
+The function mirror the memory module functions:
+*** Examples:
+- pe_dump(PackedEntites *id);
+- pp_dump(PackedPositions *pp);
+- pv_dump(PackedVelocities *pv);
+
+** General Implementaion:
+Assumptions:
+1. There is not enough memory to hold all the stores and their JSON string representation in memory.
+2. Whole stores are outputed to files, there is no point updates.
+3. Each store has its own json.
+4. The JSON is always correct, there is no write error.
+5. Writing to files overwrites them all old informations are lost.
+
+The functions write data directly to files.
+*** Pipeline:
+open file for writing
+write header data, { name : name ,
+write list start "components" : [
+iterate over a store,
+ for each iteartion add one json object to the componnets list.
+write ] } to close the json
+close the file
+
+* Map:
+filename --- file
+
+filename ----> fopen ----> file ---> memory ->> FILE*
+FILE*
+{ id: %d, pos : %d, %d } -> fprintf -> file on disk
+id
+x  -----> component { id : id, x : x, y : y } ------> { name : positions, [components ] } -----> file
+y
+||||
+sprintf control string component -> "{ 'id' : %d, 'x' : %d, 'y': %d }" <---> id, x, y
+fprint <--file <--- { 'name' : 'positions', [ sprintfs ] }
+
+The goal is to have the abilty t osave informations between runs.
+Why did i pick JSON?
+It is easer then binary saving, it gives structure and it gives me a chalenge, parsing json translating memory to chracters.
+ It is not pure suckless, i am solving for problems that i dont have yet and that is ok in this case.
+ The main goal is to have a portfolio project of decent complexity.
+Is it a system part or a component part?
+It is responsibale for translating memory to JSON and storing the JSON in a file.
+For components it is a system, but for entites it needs to be part of the module, needs to know interanl workings of the entity module, how ids are reused.
+* JSON DESIGN:
+The dump functions destroy previouse saved data. That is  very bad behavior for a critical system. The fix is to buffer the data into a string or a file. The problem with the string is that i need a dynamic string with memory allocations, file buffer i need to create a tmp file that is writen to and read, slow process.
+String takes extra memory that might not be there, file takes space that is probaly there.
+File buffering wins over string buffering.
+The components are writen component by component.
+
+* Systems:
+Systems module needs to know about the components module. Its main job is to transfrom component data.
