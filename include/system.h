@@ -1,7 +1,14 @@
+#ifndef COMPONENTS_H
+#define COMPONENTS_H
 #include "component.h"
-#include "entity.h"
-#include "memory.h"
-#include <stbool.h>
+#endif
 
-bool move_system(Entity e);
-bool attack_system(Entity source, Entity target);
+
+
+int pos_dump();
+
+int stores_dump();
+int vel_dump();
+int hp_dump();
+int att_dump();
+int ascii_dump();
