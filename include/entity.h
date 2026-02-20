@@ -26,7 +26,7 @@ static inline bool iter_valid(enIter iter) { return iter.left != 0; }
 bool enIter_init(enIter *iter);
 bool enIter_next(enIter *iter);
 bool enIter_getID(enIter *iter, int *out);
-int enIter_getMask(enIter *iter, unsigned *out);
+bool enIter_getMask(enIter *iter, unsigned *out);
 void enIter_free(enIter *iter);
 
 
