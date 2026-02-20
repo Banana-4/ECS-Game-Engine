@@ -1,11 +1,13 @@
+#ifndef MEMORY_H
+#define MEMORY_H
 #include "memory.h"
-
+#endif
 
 typedef struct {
     int id;
     unsigned int cmp_mask;
     int left;
-} EnIter;
+} enIter;
 
 bool init_entities(int capacity);
 int create_entity(int cmp_mask);
@@ -15,14 +17,19 @@ bool remove_entity(int id);
 void free_entities();
 
 
+//iterators
 
-//read only
-EnIter* create_enIter();
-bool next_enIter(EnIter* iter);
-int id_enIter(EnIter* iter);
-int mask_enIter(EnIter* iter);
-void free_enIter(EnIter* iter);
+static inline int iter_left(enIter iter) { return iter.left; }
+static inline bool iter_valid(enIter iter) { return iter.left != 0; }
 
-//debug
 
+bool enIter_init(enIter *iter);
+bool enIter_next(enIter *iter);
+bool enIter_getID(enIter *iter, int *out);
+int enIter_getMask(enIter *iter, unsigned *out);
+void enIter_free(enIter *iter);
+
+
+//output
+int en_dump();
 void print_entites_store();
