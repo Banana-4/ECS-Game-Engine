@@ -130,10 +130,10 @@ void velIter_init(velIter *iter) {
     if (!iter) {
         return;
     }
-    iter->x = pp->x;
-    iter->y = pp->y;
-    iter->base.cmp_id = pp->cmp_id;
-    iter->base.left = pp->size;
+    iter->x = pv->x;
+    iter->y = pv->y;
+    iter->base.cmp_id = pv->cmp_id;
+    iter->base.left = pv->size;
 }
 
 bool velIter_next(velIter *iter) {
