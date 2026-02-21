@@ -1,44 +1,6 @@
 #include "../include/memory.h"
 #include <stdlib.h>
 
-// Stores
-struct PackedEntities {
-  int* id;
-  unsigned* cmp_mask;
-  size_t capacity;
-  size_t size;
-
-  int id_map[MAX_ENTITIES];
-};
-
-struct PackedVec2Int {
-  int* x;
-  int* y;
-  size_t capacity;
-  size_t size;
-
-  int* cmp_id;
-  int id_map[MAX_ENTITIES];
-};
-
-struct PackedDouble {
-  double* val;
-  size_t capacity;
-  size_t size;
-
-  int* cmp_id;
-  int id_map[MAX_ENTITIES];
-};
-
-struct PackedChar {
-  char* val;
-  size_t capacity;
-  size_t size;
-
-  int* cmp_id;
-  int id_map[MAX_ENTITIES];
-};
-
 
 
 // Interface
@@ -174,7 +136,7 @@ bool ph_remove(PackedHealths* ph, int id) {
   ph->size--;
   int lastId = ph->cmp_id[ph->size];
 
-  ph->val[idx] = ph->hp[ph->size];
+  ph->val[idx] = ph->val[ph->size];
   ph->cmp_id[idx] = lastId;
 
   ph->id_map[lastId] = idx;
@@ -315,7 +277,6 @@ bool pv_insert(PackedVelocities *pv, int id, int x, int y) {
   } else {
     pv->x[idx] = x;
     pv->y[idx] = y;
-    pv->size++;
   }
   return true;
 }
@@ -397,7 +358,7 @@ bool pas_insert(PackedASCII *pas, int id, char ch) {
 
 bool pas_remove(PackedASCII *pas, int id) {
   int idx = pas->id_map[id];
-  if (id == -1)
+  if (idx == -1)
     return false;
   pas->size--;
   int lastId = pas->cmp_id[pas->size];
