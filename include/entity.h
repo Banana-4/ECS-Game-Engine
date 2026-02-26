@@ -5,4 +5,4 @@
 
 int get_id();
 void recycle_id(int id);
-void enMod_dump();
+int enMod_dump();
