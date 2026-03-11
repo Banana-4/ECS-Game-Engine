@@ -3,8 +3,8 @@
 PackedEntities* pe;
 //Iterators
 struct enIter {
-    int id;
-    unsigned int cmp_mask;
+    int *id;
+    unsigned int *cmp_mask;
     int left;
 };
 
@@ -217,15 +217,15 @@ bool enIter_init(enIter *iter) {
     if (!iter)
         return false;
     iter->left = pe->size;
-    iter->id = pe->id[pe->size - iter->left];
-    iter->cmp_mask = pe->cmp_mask[pe->size - iter->left];
+    iter->id = pe->id;
+    iter->cmp_mask = pe->cmp_mask;
     return true;
 }
 
 bool enIter_next(enIter *iter) {
     if(--iter->left >= 1) {
-        iter->id = pe->id[pe->size - iter->left];
-        iter->cmp_mask = pe->cmp_mask[pe->size - iter->left];
+        iter->id++;
+        iter->cmp_mask++;
         return true;
     }
     return false;
@@ -233,7 +233,7 @@ bool enIter_next(enIter *iter) {
 
 bool enIter_getID(enIter *iter, int *out) {
   if(iter && iter->left > 0) {
-      *out = iter->id;
+      *out = *iter->id;
       return true;
   }
   return false;
@@ -242,15 +242,10 @@ bool enIter_getID(enIter *iter, int *out) {
 
 bool enIter_getMask(enIter *iter, unsigned *out) {
    if(iter && iter->left > 0) {
-       *out = iter->cmp_mask;
+       *out = *iter->cmp_mask;
        return true;
    }
    return false;
-}
-
-void enIter_free(enIter *iter) {
-    free(iter);
-    iter = NULL;
 }
 
 inline int enIter_left(enIter* iter) { return iter->left; }
