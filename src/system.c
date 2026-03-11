@@ -1,4 +1,17 @@
 #include "../include/system.h"
+#ifndef ENTITY_H
+#define ENTITY_H
+#include "../include/entity.h"
+#endif
+#ifndef COMPONENT_H
+#define COMPONENT_H
+#include "../include/component.h"
+#endif
+#ifndef ECS_H
+#define ECS_H
+#include "../include/ecs.h"
+#endif
+
 #include <stdio.h>
 
 int pos_dump() {
@@ -144,7 +157,7 @@ int att_dump() {
         double dmg;
         attIter_getID(&iter, &id);
         attIter_getDmg(&iter, &dmg);
-        sprintf(component, "{ \"id\" : %d, \"hp\" : %lf }", id, dmg);
+        sprintf(component, "{ \"id\" : %d, \"dmg\" : %lf }", id, dmg);
         fputs(component, fp);
         attIter_next(&iter);
         if (iter_valid(iter.base)) {
@@ -183,7 +196,7 @@ int ascii_dump() {
         char c;
         pasIter_getID(&iter, &id);
         pasIter_getCh(&iter, &c);
-        sprintf(component, "{ \"id\" : %d, \"hp\" : %lf }", id, hp);
+        sprintf(component, "{ \"id\" : %d, \"ascii\" : %c }", id, c);
         fputs(component, fp);
         pasIter_next(&iter);
         if (iter_valid(iter.base)) {
@@ -196,6 +209,45 @@ int ascii_dump() {
     fflush(fp);
     fclose(fp);
     if (rename(buf_file, store_name) != 0) {
+        perror("Error renaming file");
+        return 2;
+    }
+    return 0;
+}
+
+int en_dump() {
+    const char buf[] = "data/buf_en.json";
+    const char save[] = "data/entities.json";
+    char entity[100];
+    FILE *fp = fopen(buf, "w");
+    if (!fp) {
+        perror("Failed to open buffer file");
+        return 1;
+    }
+    enIter iter;
+    if (!enIter_init(&iter)) {
+        return -1;
+    }
+
+    fputs("{ \"name\" : \"entity\", \"entities\" : [\n", fp);
+    while (1) {
+        int id;
+        unsigned mask;
+        enIter_getID(&iter, &id);
+        enIter_getMask(&iter, &mask);
+        sprintf(entity, "{ \"id\" : %d, \"mask\" : %u }", id, mask);
+        fputs(entity, fp);
+        if (enIter_next(&iter)) {
+            fputs(",\n", fp);
+        } else {
+            break;
+        }
+    }
+    fputs("] }", fp);
+    fflush(fp);
+    fclose(fp);
+
+    if (rename(buf, save) != 0) {
         perror("Error renaming file");
         return 2;
     }
