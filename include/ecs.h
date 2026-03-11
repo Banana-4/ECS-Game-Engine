@@ -29,7 +29,6 @@ bool enIter_init(enIter *iter);
 bool enIter_next(enIter *iter);
 bool enIter_getID(enIter *iter, int *out);
 bool enIter_getMask(enIter *iter, unsigned *out);
-void enIter_free(enIter *iter);
 
 //Coordinator
 bool ecs_init(int capacity);
