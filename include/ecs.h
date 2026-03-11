@@ -1,11 +1,14 @@
-#include "../include/system.h"
-#ifndef COMPONENTS_H
-#define COMPONENTS_H
+#ifndef COMPONENT_H
+#define COMPONENT_H
 #include "../include/component.h"
 #endif
 #ifndef ENTITY_H
 #define ENTITY_H
 #include "../include/entity.h"
+#endif
+#ifndef SYSTEM_H
+#define SYSTEM_H
+#include "../include/system.h"
 #endif
 
 
@@ -18,11 +21,16 @@ enum ComponentType {
 };
 
 
-typedef struct enIter enIter;
+typedef struct enIter {
+    int *id;
+    unsigned int *cmp_mask;
+    int left;
+}enIter;
+
 
 //Iterators
- inline int enIter_left(enIter* iter);
- inline bool enIter_valid(enIter* iter);
+int enIter_left(enIter* iter);
+bool enIter_valid(enIter* iter);
 
 
 bool enIter_init(enIter *iter);
@@ -55,12 +63,9 @@ bool ecs_remove_ascii(int id);
 //store
 bool init_entity_store(int capacity);
 bool remove_entity(int id);
-void free_entities();
 
 
 int create_entity(int cmp_mask);
-bool update_component_mask(int id, int cmp_mask);
 
 //output
-int enMod_dump();
 void print_entites_store();
