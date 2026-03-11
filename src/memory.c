@@ -197,6 +197,16 @@ bool pe_has(PackedEntities* pe, int id) {
     return pe->id_map[id] != -1;
 }
 
+bool pe_get(PackedEntities *pe, int id, unsigned int *out) {
+    if (!pe)
+        return false;
+    int i = pe->id_map[id];
+    if (i == -1)
+        return false;
+    *out = pe->cmp_mask[i];
+    return true;
+}
+
 bool pe_remove(PackedEntities* pe, int id) {
 
   int idx = pe->id_map[id];
