@@ -5,12 +5,6 @@
 
 PackedEntities* pe;
 //Iterators
-struct enIter {
-    int *id;
-    unsigned int *cmp_mask;
-    int left;
-};
-
 
 bool init_entity_store(int capacity) {
   pe = (PackedEntities*)malloc(sizeof(PackedEntities));
@@ -25,7 +19,7 @@ bool ecs_init(int capacity) {
 
 void ecs_stop() {
     free_stores();
-    free_entities();
+    pe_free(pe);
 }
 
 //creates a componentless entity
@@ -213,6 +207,18 @@ bool ecs_remove_ascii(int id) {
     pe_insert(pe, id, mask ^ ASCII);
     return true;
 }
+bool ecs_remove_entity(int id) {
+    if (!pe_has(pe, id))
+        return false;
+    ecs_remove_position(id);
+    ecs_remove_velocity(id);
+    ecs_remove_ascii(id);
+    ecs_remove_attack(id);
+    ecs_remove_health(id);
+    pe_remove(pe, id);
+    recycle_id(id);
+    return true;
+}
 
 // Iterators
 
@@ -261,6 +267,9 @@ void print_entites_store() {
     pe_print(pe);
 }
 
+void free_entities() {
+    pe_free(pe);
+}
 
 //garbage
 bool update_mask_entity(int id, int cmp_mask) {
