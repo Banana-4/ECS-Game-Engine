@@ -1,4 +1,7 @@
+#ifndef ECS_H
+#define ECS_H
 #include "../include/ecs.h"
+#endif
 
 PackedEntities* pe;
 //Iterators
@@ -247,6 +250,7 @@ bool enIter_getMask(enIter *iter, unsigned *out) {
    }
    return false;
 }
+
 
 inline int enIter_left(enIter* iter) { return iter->left; }
 inline bool enIter_valid(enIter* iter) { return iter->left != 0; }
