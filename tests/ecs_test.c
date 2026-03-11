@@ -35,6 +35,10 @@ int main() {
 
     print_entites_store();
 
+    printf("Testing packed entites json system\n");
+
+    en_dump();
+
     printf("Testing: removal of entities while iterating.\n");
     if (!enIter_init(&iter))
         printf("Can't init iter.\n");
