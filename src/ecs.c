@@ -267,26 +267,8 @@ void print_entites_store() {
     pe_print(pe);
 }
 
-void free_entities() {
-    pe_free(pe);
-}
-
-//garbage
-bool update_mask_entity(int id, int cmp_mask) {
-    if(pe_has(pe,id)) {
-        pe_insert(pe, id, cmp_mask);
-        return true;
-    }
-    return false;
-}
 
 
-bool remove_entity(int id) {
-   return pe_remove(pe, id);
-}
-
-
-void kill_entities() {
-    pe_free(pe);
-    free(pe);
-}
+//void free_entities() {
+//  pe_free(pe);
+//}
