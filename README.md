@@ -1,36 +1,34 @@
 # ECS Game Engine
 
-## Goal
-
-This project has two goals. 
-
-The first is to explore CS concepts:
+## Goals
+  0. Make a data processing engine for use in my personal projects.
   1. ECS design pattern - use of the design pattern as a tool for analyzing, understanding complex systems, as a framework for thinking.
-  2. Data Driven Design - designing programs around data, storing data for efficient use by the CPU.
+  2. Data Driven Design - designing programs around data, storing data for efficient processing.
   3. Exploring the C programming language.
-
-The second goal is to create a game using my own ECS Engine.
-
-
+  
 ## ECS
 
 Entity-Component-System is a approach in design, that breaks a complex system for managing data sets into its essential parts: identity, data and behaviour.
-Its main concerns is how to store and use data efficiently by the CPU, reducing cache misses and avoiding slow main memory reads. 
+Its main concerns is how to store data for efficient processing by the CPU. To reduce cache misses, and to avoid reading data from main memory that will not be process, keeping the cache filled with data without holes. 
+
 
   - Entity is a unique identifier that represents a group of components that form a single data record. It has no behaviour or data other then the one used for identification.
 
-  - Component is a single data row. It contains no logic, only state.
+  - Component is a single data cell of a column. It contains no logic, only state.
 
   - A System defines behavior. It operates on sets of components, transforming their data according to rules for that component type. Systems are the logic of the program.
 
+  
 ### How does the ECS pattern help with structuring, reasoning and understanding of a game engine:
+The ECS is responsible for game data processing. It isolates the data processing of a game engine into a separated system. 
 
-All the benefits that the ECS pattern gives are a consequence of the separation that it provides, this allows working independently on:
+All the benefits that the ECS pattern gives are a consequence of the separation that it provides.
+The seperation breaks the complex hard to define responsibility of Data Processing into clean, precise and distinct smaller responsibilities:
 1. Reasoning about the structure and informations that define a specific data entry, object.
-2. Representing a single information in memory, code.
+2. Representation of data in memory and code.
 3. Developing, testing and reasoning about systems in isolation.
 4. Creating a complex system from simple, composable parts.
-5. Allows reusing of solution for different data entries.
+5. Allows uniform data processing, one type of data is processed in the same way.
 
 ECS reduces coupling, improves clarity, allows reusing of concepts and makes large systems easier to reason about and extend.
 
@@ -60,19 +58,18 @@ The whole game can be viewed like a interactive database system that processes d
 
 
 ## Uses:
+
 THe main purpose of the ECS engine is to provide Entity storage in memory that is organized for processing in groups. To achive this the engine needs to provide the user with the ability to create and delete Entities, iterate over all entities, give acsess to systems that allowe the user to transform the data.
 The system lets the use decide how much memory he wants to use for the data.
 A Entity without any meaningless data is useless for a system whose purpose is to process data. That leads that the invariant of the system is that all Entities will have data associated with them.
 The user is expected to provide on Entity creation the types of components that the entity has.
 
 ## Data:
-
 ECS deals with Entities, that is table data:
-```
-| IDs     | COMPONENT | COMPONENT | COMPONENT |
-| KEY     | DATA      | DATA	    | DATA      |
-| KEY     | DATA      | -         | DATA      |
-```
+| IDs | COMPONENT | COMPONENT | COMPONENT |
+| KEY | DATA      | DATA      | DATA      |
+| KEY | DATA      | -         | DATA      |
+
 The key represents the owner of the data, ID of the Entity.
 A component store is a whole column of data.
 In a ECS Engine the data is bulk processed, to reduce the amount of main memory reads and copys to the CPU cache.
@@ -84,25 +81,24 @@ The individual columns are represented in memory as Structs of Arrays called sto
 
 ### ECS:
 
-This module is the point where all the other modules are joined to form the complete data engine. The main responsibility of the ECS module is to create the working structure of the system and to be the place from which the engine starts. 
-The module provides the interface for the engine, that is it makes the engine usable.
-#### Interface:
-  bool ecs_init(int capacity);
-  void ecs_stop();
+This module handles the cordination of other modules. 
+It is responsible for:
+1. Entity management.
+2. Initialization of the ECS data engine.
+3. Stoping of the ECS data engine.
+4. For providing access to the engine for other functions, other game systems.
 
-  bool ecs_create(int cmpMask);
-  bool ecs_remove(int id);
-
-  EnIter* ecs_keys();
-  void ecs_next(EnIter* iter);
-  int ecs_key(EnIter* iter);
-  void ecs_freeIter(EnIter* iter);
+#### Entity managment:
+This submodule is a set of functions and one entities store.
+It is responsible for:
+1. Creation and removal of entities.
+2. Addition and removal of components to a entity, with respect to the invariant that each entity has only one component of each type.
 
 ### Memory:
 
 This module is a subsystem that is responsible for allocating and freeing memory, organizing data using cache-friendly memory layout and providing fast access to it.
 It uses Structs of Arrays as the primary data storing unit.
-Each SoA is stores a single type of components with the ownership data.
+Each SoA stores a single type of components with the ownership data.
 The component data is stored into packed arrays and the ownership data is stored into a sparse array, where each index position represents the ID and the value at each index is the index of the component that belongs to that ID.
 
 The memory system has a clean and simple interface for each SoA:
@@ -115,43 +111,21 @@ The memory system has a clean and simple interface for each SoA:
 
 ### Entity:
 
-Subsystem for creating IDs and associating them with components.
-The subsystems core responsibility is to ensure the creation of unique whole number IDs in inclusive range 0 to MAX_ENTITIES, while allowing reuse of decommissioned IDs.
-Decommisiond IDs can be reused. For that purpose each reomved ID is pushed onto a stack.
-The module is also responsible for providing access to the Entity store for iteration.
-
-Data owned:
-  1. The IDs.
-  2. The entities store.
-  3. Decommissioned  IDs stack.
-  4. stack size.
-
-#### Interface:
-
-  1. init_entities - Allocates the storage and sets the total number of entities. If the allocation fails the whole System is stopped.
-  2. create_entity - Assigns a ID and associates it with components using a unsigned mask. If all the IDs from the pool are taken the creation of the Entity is aborted and a false signal is returned.
-  3. remove_entity - Removes the given id and its mask from the store and pushes the decommissioned ID onto the stack. If the ID is not in the store, nothing is done and false is returned.
-  4. kill_entities - Shutdown the module, by freeing all the used memory.
-
-
-#### Module specific functions:
-
-  1. get_id - returns the next available ID, popping from the stack or returning the next integer in line. If the max number of IDs is already given it returns -1.
+Subsystem for creating IDs, entities.
+The subsystems core responsibility is to ensure the creation of unique whole number IDs in inclusive range 0 to MAX_ENTITIES.
+Removed IDs are recycled by pusing them onto a stack.
 
 ### Components:
-
-This module is the owner of all components stores. 
-
-The responsibilities are:
+The components module is a sub system designed to manage components. 
+It is responsible for:
 1. Initilization of all the stores.
 2. Providing accesess to each store.
 3. Allowing data to be stored in a store.
-4. Deallocating memory of the stores, removing them. 
+4. Removal of stores. 
 
 
 ### Systems:
-Logical subsystem responsiable for logical data manipulation.
-
+This system is responsible for data transformation. Its job is to use the data that is stored in the components stores.
 
 ## File Organization:
 ```
@@ -159,21 +133,17 @@ ecs-engine/
 │
 ├── include/                 # Public headers
 │   ├── ecs.h                # Main ECS interface
-│   ├── entity.h             # Entity management
-│   ├── component.h          # Component definitions
+│   ├── entity.h             # Entity creation
+│   ├── component.h          # Component managment
 │   ├── system.h             # System interface
-│   ├── memory.h             # Memory management (dynamic arrays, allocators)
-│   ├── input.h              # User input handlers
-|   └── render.h             # Displays data on the screen
+│   └── memory.h             # Memory management (dynamic arrays, allocators)
 |
 ├── src/                     # Source files
 │   ├── ecs.c                # ECS engine core
 │   ├── entity.c             # Entity implementation
 │   ├── component.c          # Component storage/management
 │   ├── system.c             # System execution logic
-│   ├── memory.c             # Dynamic array / memory subsystem
-│   ├── input.c              # Converts user input into commands, that call systems on specific entities
-|   └── render.c             # Draws the entites on the screen
+│   └── memory.c             # Dynamic array / memory subsystem
 |
 ├── examples/                # Example usage of your ECS
 │   └── main.c               # Sample game loop or test
@@ -182,15 +152,11 @@ ecs-engine/
 │   ├── test_entities.c
 │   ├── test_components.c
 │   ├── test_systems.c
-|   ├── test_input.c
-|   ├── test_render.c
+|   ├── test_ecs.c
 │   └── test_memory.c
 │
 ├── CMakeLists.txt           # Build system file (if using CMake)
 ├── Makefile                 # Optional Makefile for building
 └── README.md                # Project overview
 ```
-
-## Moduls Interactions:
-
-
+# Copyright Igor Stanojevic
