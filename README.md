@@ -159,4 +159,3 @@ ecs-engine/
 ├── Makefile                 # Optional Makefile for building
 └── README.md                # Project overview
 ```
-# Copyright Igor Stanojevic
